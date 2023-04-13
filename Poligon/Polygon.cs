@@ -5,38 +5,52 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using System.IO;
+using System.Runtime.Remoting.Messaging;
 
 namespace Poligon
 {
     public class Polygon
     {
-        PointF[] points;
+        public PointF[] points;
         public static Random rnd = new Random();
-
+        public int lenght { get { return points.Length; } }
         public Polygon(int n, int maxX, int maxY)
         {
-            points=new PointF[n];
-            for(int i = 0; i < n; i++)
+            points = new PointF[n];
+            for (int i = 0; i < n; i++)
             {
-                points[i]=new PointF(rnd.Next(maxX),rnd.Next(maxY));
+                points[i] = new PointF(rnd.Next(maxX), rnd.Next(maxY));
             }
         }
-        public Polygon(string filename)
+        public Matrix PolygonToMatrix()
         {
-            TextReader reader = new StreamReader(filename);
+            Matrix toReturn = new Matrix(lenght);
+            for (int i = 0; i < lenght; i++)
+            {
+                toReturn.a[0, i] = (int)points[i].X;
+                toReturn.a[1, i] = (int)points[i].Y;
+            }
+            return toReturn;
+        }
+        public Polygon(string fileName)
+        {
+            TextReader reader = new StreamReader(fileName);
             List<string> lines = new List<string>();
             string buffer;
-            while((buffer = reader.ReadLine()) != null)
+            while ((buffer = reader.ReadLine()) != null)
             {
                 lines.Add(buffer);
             }
             reader.Close();
-            points=new PointF[lines.Count];
-
-            for(int i=0;i<points.Length;i++)
+            points = new PointF[lines.Count];
+            for (int i = 0; i < points.Length; i++)
             {
                 points[i] = new PointF(float.Parse(lines[i].Split(' ')[0]), float.Parse(lines[i].Split(' ')[1]));
             }
+        }
+        public Polygon(int a)
+        {
+            points = new PointF[a];
         }
         public float Perimeter()
         {
@@ -45,21 +59,20 @@ namespace Poligon
                 toReturn += MyMath.Distance(points[i], points[(i + 1) % points.Length]);
 
             return toReturn;
-
         }
+
         public PointF G()
         {
             float toReturnX = 0;
             float toReturnY = 0;
 
-            for(int i=0;i< points.Length;i++)
+            for (int i = 0; i < points.Length; i++)
             {
                 toReturnX += points[i].X;
                 toReturnY += points[i].Y;
             }
-            return new PointF(toReturnX/points.Length, toReturnY/points.Length); 
+            return new PointF(toReturnX / points.Length, toReturnY / points.Length);
         }
-
         public float Area()
         {
             float area = 0;
@@ -72,7 +85,7 @@ namespace Poligon
 
         public void Draw(Graphics handler)
         {
-            handler.DrawPolygon(Pens.Black,points);
+            handler.DrawPolygon(Pens.Black, points);
         }
     }
 }
